@@ -31,7 +31,6 @@ if (isset($_GET["delete"]) && $_SESSION["username"] === $adminUsername) {
     exit;
 }
 
-
 if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["post"]) && !empty($_POST["subject"])) {
     $predmet = str_replace("\n", " ", trim($_POST["subject"]));
     $text = str_replace("\n", "|n|", trim($_POST["post"]));
@@ -59,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["post"]) && !empty($_
 
         .container {
             max-width: 800px;
-            margin-top: 60px;
+            margin-top: 100px;
         }
 
         .card {
@@ -83,26 +82,38 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["post"]) && !empty($_
             resize: vertical;
         }
 
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-
         .header {
             color: white;
             text-align: center;
             margin-bottom: 30px;
         }
+        .custom-navbar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
 
-<div class="container position-relative">
-    <a href="?logout=true" class="btn btn-outline-light logout-btn">Odhlásit se</a>
+<nav class="navbar navbar-expand-lg navbar-dark custom-navbar fixed-top">
+    <div class="container-fluid">
+        <span class="navbar-brand">Jednoduché fórum</span>
+        <div class="d-flex ms-auto">
+            <div class="dropdown">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <?php echo htmlspecialchars($_SESSION["username"]); ?>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="?logout=1">Odhlásit se</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
 
-    <h2 class="header">Jste přihlášen jako uživatel <?= htmlspecialchars($_SESSION["username"]) ?></h2>
-
+<div class="container">
     <div class="card p-4 mb-4">
         <form method="post">
             <div class="mb-3">
@@ -122,33 +133,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["post"]) && !empty($_
     <div class="card p-4">
         <h5 class="mb-3">Příspěvky:</h5>
         <?php
-if (file_exists($postsFile)) {
-    $lines = file($postsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach (array_reverse($lines) as $line) {
-        [$id, $cas, $autor, $predmet, $text] = explode("|", trim($line), 5);
-        $safeSubject = htmlspecialchars($predmet);
-        $safeText = nl2br(htmlspecialchars(str_replace("|n|", "\n", $text)));
-        $isMyPost = $autor === $_SESSION["username"];
-        $highlight = $isMyPost ? 'bg-light' : 'bg-white';
+        if (file_exists($postsFile)) {
+            $lines = file($postsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach (array_reverse($lines) as $line) {
+                [$id, $cas, $autor, $predmet, $text] = explode("|", trim($line), 5);
+                $safeSubject = htmlspecialchars($predmet);
+                $safeText = nl2br(htmlspecialchars(str_replace("|n|", "\n", $text)));
+                $isMyPost = $autor === $_SESSION["username"];
+                $highlight = $isMyPost ? 'bg-light' : 'bg-white';
 
-        echo "<div class='p-4 mb-4 border rounded shadow-sm $highlight'>";
-        echo "<h5 class='fw-bold mb-2'>$safeSubject</h5>";
-        echo "<div class='mb-3'>$safeText</div>";
-        echo "<div class='d-flex justify-content-between text-muted small'>";
-        echo "<span>$autor &bull; $cas</span>";
-        if ($_SESSION["username"] === $adminUsername) {
-            echo "<a href='?delete=$id' class='text-danger text-decoration-none' onclick=\"return confirm('Opravdu chcete smazat tento příspěvek?');\">Smazat</a>";
+                echo "<div class='p-4 mb-4 border rounded shadow-sm $highlight'>";
+                echo "<h5 class='fw-bold mb-2'>$safeSubject</h5>";
+                echo "<div class='mb-3'>$safeText</div>";
+                echo "<div class='d-flex justify-content-between text-muted small'>";
+                echo "<span>$autor &bull; $cas</span>";
+                if ($_SESSION["username"] === $adminUsername) {
+                    echo "<a href='?delete=$id' class='text-danger text-decoration-none' onclick=\"return confirm('Opravdu chcete smazat tento příspěvek?');\">Smazat</a>";
+                }
+                echo "</div>";
+                echo "</div>";
+            }
+        } else {
+            echo "<p>Žádné příspěvky.</p>";
         }
-        echo "</div>";
-        echo "</div>";
-    }
-} else {
-    echo "<p>Žádné příspěvky.</p>";
-}
-
         ?>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

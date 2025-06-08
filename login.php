@@ -5,10 +5,10 @@ $usersFile = "users.txt";
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $username = trim($_POST["username"]);
-    $password = $_POST["password"];
+    $uzivatel = trim($_POST["username"]);
+    $heslo = $_POST["password"];
 
-    if ($username === "" || $password === "") {
+    if ($uzivatel === "" || $heslo === "") {
         $error = "Vyplňte prosím všechna pole.";
     } else {
         $users = [];
@@ -20,12 +20,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
 
-        if (!isset($users[$username])) {
+        if (!isset($users[$uzivatel])) {
             $error = "Uživatel s tímto jménem neexistuje.";
-        } elseif (!password_verify($password, $users[$username])) {
+        } elseif (!password_verify($heslo, $users[$uzivatel])) {
             $error = "Nesprávné heslo.";
         } else {
-            $_SESSION["username"] = htmlspecialchars($username);
+            $_SESSION["username"] = htmlspecialchars($uzivatel);
             header("Location: forum.php");
             exit;
         }

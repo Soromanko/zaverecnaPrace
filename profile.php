@@ -6,29 +6,25 @@ if (!isset($_SESSION["username"])) {
     exit;
 }
 
-// Na začátku souboru, kde jsou definovány konstanty
 $uploadsDir = "uploads/";
 if (!file_exists($uploadsDir)) {
     mkdir($uploadsDir, 0777, true);
 }
 
-// Zkopírujte výchozí avatar do uploads složky, pokud tam není
-$defaultImage = "default-avatar.png";
+$defaultImage = "default.png";
 $defaultImagePath = $uploadsDir . $defaultImage;
 if (!file_exists($defaultImagePath)) {
-    copy("images/" . $defaultImage, $defaultImagePath); // Předpokládá, že máte výchozí obrázek v složce images/
+    copy("images/" . $defaultImage, $defaultImagePath);
 }
 
 $usersFile = "users.txt";
-$defaultImage = "default-avatar.png";
+$defaultImage = "default.png";
 $message = "";
 
-// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Handle profile picture upload
     if (isset($_FILES["profile_picture"]) && $_FILES["profile_picture"]["error"] == 0) {
         $allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-        $maxSize = 5 * 1024 * 1024; // 5MB
+        $maxSize = 5 * 1024 * 1024;
 
         if (in_array($_FILES["profile_picture"]["type"], $allowedTypes) &&
             $_FILES["profile_picture"]["size"] <= $maxSize) {
@@ -37,15 +33,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $newFileName = $_SESSION["username"] . "_" . time() . "." . $fileExtension;
             $targetPath = $uploadsDir . $newFileName;
 
-            if (move_uploaded_file($_FILES["profile_picture"]["file"], $targetPath)) {
-                // Update user's profile picture in users.txt
+            if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $targetPath)) {
                 $users = file($usersFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
                 $newUsers = [];
 
                 foreach ($users as $user) {
                     $userData = explode("|", $user);
                     if ($userData[0] === $_SESSION["username"]) {
-                        $userData[2] = $newFileName; // Update profile picture
+                        $userData[2] = $newFileName;
                         $user = implode("|", $userData);
                     }
                     $newUsers[] = $user;
@@ -62,7 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-// Get current user's profile picture
 $profilovka = $defaultImage;
 if (file_exists($usersFile)) {
     $users = file($usersFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -80,7 +74,7 @@ if (file_exists($usersFile)) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Profile Settings</title>
+    <title>Profil</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
     <style>
         body {
@@ -108,7 +102,7 @@ if (file_exists($usersFile)) {
 <body>
 <div class="container">
     <div class="card p-4">
-        <h2 class="text-center mb-4">Profile Settings</h2>
+        <h2 class="text-center mb-4">Nastavení profilu</h2>
 
         <?php if ($message): ?>
             <div class="alert alert-info"><?= htmlspecialchars($message) ?></div>
@@ -123,7 +117,7 @@ if (file_exists($usersFile)) {
 
         <form method="post" enctype="multipart/form-data">
             <div class="mb-3">
-                <label for="profile_picture" class="form-label">Change Profile Picture</label>
+                <label for="profile_picture" class="form-label">Změna profilovky</label>
                 <input type="file"
                        class="form-control"
                        id="profile_picture"
@@ -133,8 +127,8 @@ if (file_exists($usersFile)) {
             </div>
 
             <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary">Update Profile</button>
-                <a href="forum.php" class="btn btn-outline-secondary">Back to Forum</a>
+                <button type="submit" class="btn btn-primary">Uložit</button>
+                <a href="forum.php" class="btn btn-outline-secondary">Zpět</a>
             </div>
         </form>
     </div>

@@ -6,13 +6,13 @@ $error = "";
 $success = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $username = trim($_POST["username"]);
-    $password = $_POST["password"];
-    $password2 = $_POST["password2"];
+    $uzivatel = trim($_POST["username"]);
+    $heslo = $_POST["password"];
+    $hesloZnovu = $_POST["password2"];
 
-    if ($username === "" || $password === "" || $password2 === "") {
+    if ($uzivatel === "" || $heslo === "" || $hesloZnovu === "") {
         $error = "Vyplňte prosím všechna pole.";
-    } elseif ($password !== $password2) {
+    } elseif ($heslo !== $hesloZnovu) {
         $error = "Hesla se neshodují.";
     } else {
         $users = [];
@@ -24,11 +24,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
 
-        if (isset($users[$username])) {
+        if (isset($users[$uzivatel])) {
             $error = "Uživatel s tímto jménem již existuje.";
         } else {
-            $hash = password_hash($password, PASSWORD_DEFAULT);
-            file_put_contents($usersFile, "$username|$hash\n", FILE_APPEND);
+            $hash = password_hash($heslo, PASSWORD_DEFAULT);
+            file_put_contents($usersFile, "$uzivatel|$hash\n", FILE_APPEND);
             $success = "Registrace proběhla úspěšně. Nyní se můžete přihlásit.";
         }
     }

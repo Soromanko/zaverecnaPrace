@@ -87,6 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["post"]) && !empty($_
             text-align: center;
             margin-bottom: 30px;
         }
+
         .custom-navbar {
             background: linear-gradient(135deg, #667eea, #764ba2);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -135,6 +136,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["post"]) && !empty($_
         <?php
         if (file_exists($postsFile)) {
             $lines = file($postsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+            $userAvatars = [];
+            $usersFile = "users.txt";
+            $uploadsDir = "uploads/";
+            $defaultImage = "default.png";
+
+            if (file_exists($usersFile)) {
+                $users = file($usersFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                foreach ($users as $userLine) {
+                    $userData = explode("|", $userLine);
+                    if (count($userData) >= 3) {
+                        $userAvatars[$userData[0]] = $userData[2] ?: $defaultImage;
+                    }
+                }
+            }
+
             foreach (array_reverse($lines) as $line) {
                 [$id, $cas, $autor, $predmet, $text] = explode("|", trim($line), 5);
                 $safeSubject = htmlspecialchars($predmet);
@@ -142,11 +159,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["post"]) && !empty($_
                 $isMyPost = $autor === $_SESSION["username"];
                 $highlight = $isMyPost ? 'bg-light' : 'bg-white';
 
+                $avatarFile = isset($userAvatars[$autor]) ? $userAvatars[$autor] : $defaultImage;
+                $profileImagePath = $uploadsDir . $avatarFile;
+                if (!file_exists($profileImagePath) || !is_file($profileImagePath)) {
+                    $profileImagePath = $uploadsDir . $defaultImage;
+                }
+
                 echo "<div class='p-4 mb-4 border rounded shadow-sm $highlight'>";
                 echo "<h5 class='fw-bold mb-2'>$safeSubject</h5>";
                 echo "<div class='mb-3'>$safeText</div>";
-                echo "<div class='d-flex justify-content-between text-muted small'>";
-                echo "<span>$autor &bull; $cas</span>";
+                echo "<div class='d-flex align-items-center justify-content-between text-muted small'>";
+                echo "<div class='d-flex align-items-center'>";
+                echo "<img src='" . htmlspecialchars($profileImagePath) . "' alt='avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px;'>";
+                echo "<span><strong>" . htmlspecialchars($autor) . "</strong> &bull; $cas</span>";
+                echo "</div>";
                 if ($_SESSION["username"] === $adminUsername) {
                     echo "<a href='?delete=$id' class='text-danger text-decoration-none' onclick=\"return confirm('Opravdu chcete smazat tento příspěvek?');\">Smazat</a>";
                 }

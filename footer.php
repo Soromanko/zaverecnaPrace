@@ -1,4 +1,4 @@
 <footer class="text-center text-muted mt-5 mb-3">
     <hr>
-    <p>Samuel Švach</p>
+    <p class="text-white">&copy; Samuel Švach</p>
 </footer>

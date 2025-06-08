@@ -76,43 +76,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["post"]) && !empty($_
         .my-post {
             background-color: #f0f8ff;
         }
-
-        textarea.form-control {
-            border-radius: 1rem;
-            resize: vertical;
-        }
-
-        .header {
-            color: white;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .custom-navbar {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
     </style>
 </head>
 <body>
-
-<nav class="navbar navbar-expand-lg navbar-dark custom-navbar fixed-top">
-    <div class="container-fluid">
-        <span class="navbar-brand">Jednoduché fórum</span>
-        <div class="d-flex ms-auto">
-            <div class="dropdown">
-                <button class="btn btn-outline-light dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <?php echo htmlspecialchars($_SESSION["username"]); ?>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                    <li><a class="dropdown-item" href="profile.php">Profil</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="?logout=1">Odhlásit se</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</nav>
+<?php require_once ("header.php"); ?>
 
 <div class="container">
     <div class="card p-4 mb-4">
@@ -186,6 +153,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST["post"]) && !empty($_
     </div>
 </div>
 
+<?php require_once ("footer.php"); ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
